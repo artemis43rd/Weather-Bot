@@ -1,0 +1,71 @@
+package com.telegrambot.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+@Configuration
+@PropertySource("classpath:database.properties")
+public class DatabaseConfig {
+
+    @Value("${db.driver}")
+    private String driverClassName;
+
+    @Value("${db.url}")
+    private String url;
+
+    @Value("${db.username}")
+    private String username;
+
+    @Value("${db.password}")
+    private String password;
+
+    @Value("${db.pool.initialSize}")
+    private int initialSize;
+
+    @Value("${db.pool.maxTotal}")
+    private int maxTotal;
+
+    @Value("${db.pool.minIdle}")
+    private int minIdle;
+
+    @Value("${db.pool.maxIdle}")
+    private int maxIdle;
+
+    @Bean
+    public DataSource dataSource() {
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(driverClassName);
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+
+        // Настройки пула соединений
+        dataSource.setInitialSize(initialSize);
+        dataSource.setMaxTotal(maxTotal);
+        dataSource.setMinIdle(minIdle);
+        dataSource.setMaxIdle(maxIdle);
+        return dataSource;
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplate() {
+        return new JdbcTemplate(dataSource());
+    }
+
+    // Выполнение скрипта SQL для создания таблицы
+    @Bean
+    public void initDatabase() throws IOException {
+        String createTableSql = new String(Files.readAllBytes(Paths.get("src/main/resources/create.sql")));
+        jdbcTemplate().execute(createTableSql);
+    }
+}

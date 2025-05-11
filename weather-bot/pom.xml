@@ -13,12 +13,12 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-extensions</artifactId>
-            <version>7.2.1</version>
+            <version>7.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
-            <version>7.2.1</version>
+            <version>7.11.0</version>
         </dependency>
 
         <!-- SLF4J для логирования -->
@@ -30,15 +30,30 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.6</version>
+            <version>1.5.18</version>
         </dependency>
 
         <!-- Spring Framework -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>5.3.32</version>
+            <version>6.2.6</version>
         </dependency>
+
+        <!-- Spring JDBC -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>6.2.6</version>
+        </dependency>
+
+        <!-- Apache Commons DBCP2 для пула соединений -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+
     </dependencies>
 
     <properties>
