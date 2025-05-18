@@ -31,9 +31,13 @@ public class TelegramConfig {
     @Autowired
     SetLocation setLocation;
 
+    @Autowired
+    HelpCommand help;
+
     @Bean
     public BotSession sessionStart(TelegramBotsLongPollingApplication botsApplication, TelegramBot bot) throws TelegramApiException {
         bot.register(start);
+        bot.register(help);
         bot.register(setLocation);
         return botsApplication.registerBot(env.getProperty("token"), bot);
     }
