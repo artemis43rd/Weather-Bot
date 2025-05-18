@@ -23,4 +23,19 @@ public class KeyboardFactory {
         List<InlineKeyboardButton> row = List.of(oneDay, twoDays, threeDays);
         return new InlineKeyboardMarkup(List.of(new InlineKeyboardRow(row)));
     }
+
+    public InlineKeyboardMarkup createDaysSelectionKeyboardWithCity(String cityName) {
+        InlineKeyboardButton oneDay = new InlineKeyboardButton("Today");
+        oneDay.setCallbackData("weather_days_" + cityName + "_1");
+
+        InlineKeyboardButton twoDays = new InlineKeyboardButton("Tomorrow");
+        twoDays.setCallbackData("weather_days_" + cityName + "_2");
+
+        InlineKeyboardButton threeDays = new InlineKeyboardButton("3 days ahead");
+        threeDays.setCallbackData("weather_days_" + cityName + "_3");
+
+        List<InlineKeyboardButton> row = List.of(oneDay, twoDays, threeDays);
+        return new InlineKeyboardMarkup(List.of(new InlineKeyboardRow(row)));
+    }
+
 }

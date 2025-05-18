@@ -49,6 +49,19 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
                 logger.error("Error deleting a message", e);
             }
 
+            if (data.startsWith("weather_days_")) {
+                String[] parts = data.split("_", 4);
+                String city = parts[2];
+                String daysStr = parts[3];
+                int days;
+                try {
+                    days = Integer.parseInt(daysStr);
+                } catch (NumberFormatException e) {
+                    days = 1; // default 1 день
+                }
+                weatherCommand.execute(client, user, chat, new String[]{city, String.valueOf(days)});
+            }
+
             if (data.startsWith("forecast_days_")) {
                 int days;
                 try {

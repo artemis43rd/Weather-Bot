@@ -32,18 +32,16 @@ public class WeatherService {
         this.keyboardFactory = keyboardFactory;
     }
 
+    boolean isCityName(String arg) {
+        return arg != null && !arg.isBlank() &&
+            arg.matches("[\\p{L} \\-]+") &&
+            !arg.matches("\\d+");
+    }
+
     public void handleWeatherCommand(TelegramClient client, User user, Chat chat, String[] args) {
         if (args.length == 0) {
             sendDaysSelectionMessage(client, chat.getId());
             return;
-        }
-
-        int forecastDays;
-        try {
-            forecastDays = Integer.parseInt(args[0]);
-            if (forecastDays < 1 || forecastDays > 3) forecastDays = 3;
-        } catch (Exception e) {
-            forecastDays = 3;
         }
 
         var dbUser = userService.getUser(user.getId());
@@ -52,11 +50,50 @@ public class WeatherService {
             return;
         }
 
+        int forecastDays;
+        String cityName;
+        int argCount = args.length;
+
+        switch (argCount) {
+            case 1:
+                if (isCityName(args[0])) {
+                    cityName=args[0];
+                    sendDaysSelectionMessage(client, chat.getId(), cityName);
+                    return;
+                } else {
+                    try {
+                        forecastDays = Integer.parseInt(args[0]);
+                        if (forecastDays < 1 || forecastDays > 3) forecastDays = 1;
+                    } catch (Exception e) {
+                        forecastDays = 1;
+                    }
+                    cityName = dbUser.getCityName();
+                }
+                break;
+            case 2:
+                if (isCityName(args[0])) {
+                    cityName=args[0];
+                    try {
+                        forecastDays = Integer.parseInt(args[1]);
+                        if (forecastDays < 1 || forecastDays > 3) forecastDays = 1;
+                    } catch (Exception e) {
+                        forecastDays = 1;
+                    }
+                } else {
+                    sendMessage(client, chat.getId(), "First argument must be a city name or number of days [1-3].");
+                    return;
+                }
+                break;
+            default:
+                sendMessage(client, chat.getId(), String.format("Wrong number of arguments [%d] for /weather", argCount));
+                return;
+        }
+
         String url;
-        if (dbUser.getCityName() != null && !dbUser.getCityName().isBlank()) {
+        if (cityName != null && !cityName.isBlank()) {
             url = String.format(
                     "https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=metric&lang=eng",
-                    dbUser.getCityName(), apiKey);
+                    cityName, apiKey);
         } else if (dbUser.getLatitude() != null && dbUser.getLongitude() != null) {
             url = String.format(
                     "https://api.openweathermap.org/data/2.5/forecast?lat=%s&lon=%s&appid=%s&units=metric&lang=eng",
@@ -110,6 +147,19 @@ public class WeatherService {
     private void sendDaysSelectionMessage(TelegramClient client, long chatId) {
         InlineKeyboardMarkup markup = keyboardFactory.createDaysSelectionKeyboard();
         String messageText = "Select the number of forecast days:";
+        SendMessage sendMessage = new SendMessage(String.valueOf(chatId), messageText);
+        sendMessage.setReplyMarkup(markup);
+
+        try {
+            client.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendDaysSelectionMessage(TelegramClient client, long chatId, String cityName) {
+        InlineKeyboardMarkup markup = keyboardFactory.createDaysSelectionKeyboardWithCity(cityName);
+        String messageText = String.format("Select the number of forecast days for %s:", cityName);
         SendMessage sendMessage = new SendMessage(String.valueOf(chatId), messageText);
         sendMessage.setReplyMarkup(markup);
 
