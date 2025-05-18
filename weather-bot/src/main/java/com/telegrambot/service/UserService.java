@@ -27,4 +27,8 @@ public class UserService {
     public User getUser(long telegramId) {
         return userRepository.findByTelegramId(telegramId);
     }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
 }
