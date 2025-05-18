@@ -32,6 +32,9 @@ public class TelegramConfig {
     SetLocation setLocation;
 
     @Autowired
+    PrintSettings settings;
+
+    @Autowired
     HelpCommand help;
 
     @Bean
@@ -39,6 +42,7 @@ public class TelegramConfig {
         bot.register(start);
         bot.register(help);
         bot.register(setLocation);
+        bot.register(settings);
         return botsApplication.registerBot(env.getProperty("token"), bot);
     }
 
