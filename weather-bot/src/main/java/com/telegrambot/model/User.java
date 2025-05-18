@@ -10,18 +10,16 @@ public class User {
     private BigDecimal longitude;
     private Time scheduleTime;
     private boolean notifyCataclysm;
-    private Time time_notify;
 
     // Конструкторы
     public User(long telegram_id, String cityName, BigDecimal latitude, BigDecimal longitude,
-                Time scheduleTime, boolean notifyPrecipitation, boolean notifyCataclysm, Time time_notify) {
+                Time scheduleTime, boolean notifyPrecipitation, boolean notifyCataclysm) {
         this.telegram_id = telegram_id;
         this.cityName = cityName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.scheduleTime = scheduleTime;
         this.notifyCataclysm = notifyCataclysm;
-        this.time_notify = time_notify;
     }
 
     public User() {
@@ -76,14 +74,6 @@ public class User {
 
     public void setNotifyCataclysm(boolean notifyCataclysm) {
         this.notifyCataclysm = notifyCataclysm;
-    }
-
-    public Time getTimeNotify() {
-        return time_notify;
-    }
-
-    public void setTimeNotify(Time time_notify) {
-        this.time_notify = time_notify;
     }
 
     @Override

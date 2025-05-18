@@ -23,15 +23,14 @@ public class UserRepository {
     @Transactional
     public void save(User user) {
         String sql = "INSERT INTO users (telegram_id, city_name, latitude, longitude, " +
-                    "schedule_time, notify_cataclysm, time_notify) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                    "schedule_time, notify_cataclysm) " +
+                    "VALUES (?, ?, ?, ?, ?, ?) " +
                     "ON CONFLICT (telegram_id) DO UPDATE SET " +
                     "city_name = EXCLUDED.city_name, " +
                     "latitude = EXCLUDED.latitude, " +
                     "longitude = EXCLUDED.longitude, " +
                     "schedule_time = EXCLUDED.schedule_time, " +
-                    "notify_cataclysm = EXCLUDED.notify_cataclysm, " +
-                    "time_notify = EXCLUDED.time_notify";
+                    "notify_cataclysm = EXCLUDED.notify_cataclysm";
 
         jdbcTemplate.update(sql,
                 user.getTelegramId(),
@@ -39,8 +38,7 @@ public class UserRepository {
                 user.getLatitude(),
                 user.getLongitude(),
                 user.getScheduleTime(),
-                user.isNotifyCataclysm(),
-                user.getTimeNotify()
+                user.isNotifyCataclysm()
         );
     }
 }
