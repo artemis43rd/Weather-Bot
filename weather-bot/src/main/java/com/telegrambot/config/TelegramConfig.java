@@ -35,6 +35,9 @@ public class TelegramConfig {
     PrintSettings settings;
 
     @Autowired
+    Weather weather;
+
+    @Autowired
     HelpCommand help;
 
     @Bean
@@ -43,6 +46,7 @@ public class TelegramConfig {
         bot.register(help);
         bot.register(setLocation);
         bot.register(settings);
+        bot.register(weather);
         return botsApplication.registerBot(env.getProperty("token"), bot);
     }
 

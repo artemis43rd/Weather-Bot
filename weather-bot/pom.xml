@@ -47,6 +47,14 @@
             <version>6.2.6</version>
         </dependency>
 
+        <!-- Spring REST -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>6.2.6</version>
+        </dependency>
+
+
         <!-- Apache Commons DBCP2 для пула соединений -->
         <dependency>
             <groupId>org.apache.commons</groupId>
