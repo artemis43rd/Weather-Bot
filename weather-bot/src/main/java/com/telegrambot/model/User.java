@@ -9,7 +9,6 @@ public class User {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private Time scheduleTime;
-    private boolean notifyPrecipitation;
     private boolean notifyCataclysm;
     private Time time_notify;
 
@@ -21,13 +20,11 @@ public class User {
         this.latitude = latitude;
         this.longitude = longitude;
         this.scheduleTime = scheduleTime;
-        this.notifyPrecipitation = notifyPrecipitation;
         this.notifyCataclysm = notifyCataclysm;
         this.time_notify = time_notify;
     }
 
     public User() {
-        this.notifyPrecipitation = false;
         this.notifyCataclysm = false;
     }
 
@@ -73,14 +70,6 @@ public class User {
         this.scheduleTime = scheduleTime;
     }
 
-    public boolean isNotifyPrecipitation() {
-        return notifyPrecipitation;
-    }
-
-    public void setNotifyPrecipitation(boolean notifyPrecipitation) {
-        this.notifyPrecipitation = notifyPrecipitation;
-    }
-
     public boolean isNotifyCataclysm() {
         return notifyCataclysm;
     }
@@ -105,7 +94,6 @@ public class User {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", scheduleTime=" + scheduleTime +
-                ", notifyPrecipitation=" + notifyPrecipitation +
                 ", notifyCataclysm=" + notifyCataclysm +
                 '}';
     }
