@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.telegrambot.model.User;
 
@@ -15,8 +14,35 @@ public class UserRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<User> getUsers() {
-        String sql = "SELECT * FROM users";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class));
+    public User findByTelegramId(long telegramId) {
+        String sql = "SELECT * FROM users WHERE telegram_id = ?";
+        var users = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class), telegramId);
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Transactional
+    public void save(User user) {
+        String sql = "INSERT INTO users (telegram_id, city_name, latitude, longitude, schedule_time, " +
+                    "notify_precipitation, notify_cataclysm, time_notify) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+                    "ON CONFLICT (telegram_id) DO UPDATE SET " +
+                    "city_name = EXCLUDED.city_name, " +
+                    "latitude = EXCLUDED.latitude, " +
+                    "longitude = EXCLUDED.longitude, " +
+                    "schedule_time = EXCLUDED.schedule_time, " +
+                    "notify_precipitation = EXCLUDED.notify_precipitation, " +
+                    "notify_cataclysm = EXCLUDED.notify_cataclysm, " +
+                    "time_notify = EXCLUDED.time_notify";
+
+        jdbcTemplate.update(sql,
+                user.getTelegramId(),
+                user.getCityName(),
+                user.getLatitude(),
+                user.getLongitude(),
+                user.getScheduleTime(),
+                user.isNotifyPrecipitation(),
+                user.isNotifyCataclysm(),
+                user.getTimeNotify()
+        );
     }
 }

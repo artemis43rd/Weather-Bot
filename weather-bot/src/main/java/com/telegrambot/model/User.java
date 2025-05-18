@@ -4,34 +4,41 @@ import java.math.BigDecimal;
 import java.sql.Time;
 
 public class User {
-    private long chatId;
+    private long telegram_id;
     private String cityName;
     private BigDecimal latitude;
     private BigDecimal longitude;
     private Time scheduleTime;
     private boolean notifyPrecipitation;
     private boolean notifyCataclysm;
+    private Time time_notify;
 
-    // Конструктор
-    public User(long chatId, String cityName, BigDecimal latitude, BigDecimal longitude,
-                Time scheduleTime, boolean notifyPrecipitation, boolean notifyCataclysm) {
-        this.chatId = chatId;
+    // Конструкторы
+    public User(long telegram_id, String cityName, BigDecimal latitude, BigDecimal longitude,
+                Time scheduleTime, boolean notifyPrecipitation, boolean notifyCataclysm, Time time_notify) {
+        this.telegram_id = telegram_id;
         this.cityName = cityName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.scheduleTime = scheduleTime;
         this.notifyPrecipitation = notifyPrecipitation;
         this.notifyCataclysm = notifyCataclysm;
+        this.time_notify = time_notify;
+    }
+
+    public User() {
+        this.notifyPrecipitation = false;
+        this.notifyCataclysm = false;
     }
 
     // Геттеры и сеттеры
 
-    public long getChatId() {
-        return chatId;
+    public long getTelegramId() {
+        return telegram_id;
     }
 
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
+    public void setTelegramId(long telegram_id) {
+        this.telegram_id = telegram_id;
     }
 
     public String getCityName() {
@@ -82,10 +89,18 @@ public class User {
         this.notifyCataclysm = notifyCataclysm;
     }
 
+    public Time getTimeNotify() {
+        return time_notify;
+    }
+
+    public void setTimeNotify(Time time_notify) {
+        this.time_notify = time_notify;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "chatId=" + chatId +
+                "telegram_id=" + telegram_id +
                 ", cityName='" + cityName + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +

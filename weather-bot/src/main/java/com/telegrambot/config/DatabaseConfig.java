@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,7 +63,7 @@ public class DatabaseConfig {
     }
 
     // Выполнение скрипта SQL для создания таблицы
-    @Bean
+    @PostConstruct
     public void initDatabase() throws IOException {
         String createTableSql = new String(Files.readAllBytes(Paths.get("src/main/resources/create.sql")));
         jdbcTemplate().execute(createTableSql);

@@ -7,14 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
-import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.longpolling.BotSession;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.telegrambot.component.*;
 
-import java.util.Collection;
 
 @Configuration
 @PropertySource("classpath:bot.properties")
@@ -27,8 +25,12 @@ public class TelegramConfig {
     @Autowired
     TelegramBot bot;
 
+    @Autowired
+    StartCommand start;
+
     @Bean
     public BotSession sessionStart(TelegramBotsLongPollingApplication botsApplication, TelegramBot bot) throws TelegramApiException {
+        bot.register(start);
         return botsApplication.registerBot(env.getProperty("token"), bot);
     }
 
