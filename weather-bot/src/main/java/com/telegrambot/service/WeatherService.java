@@ -3,7 +3,6 @@ package com.telegrambot.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -11,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -18,7 +18,7 @@ import java.util.*;
 
 import com.telegrambot.component.KeyboardFactory;
 
-@Component
+@Service
 public class WeatherService {
 
     @Value("${api-key}")
