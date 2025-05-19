@@ -43,7 +43,6 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
     private final TelegramClient client;
     private final Weather weatherCommand;
     private final ScheduledExecutorService scheduler;
-    private final ScheduledExecutorService schedulerWeatherCheck;
 
     private final UserService userService;
 
@@ -52,16 +51,18 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
         super(client, true, () -> botName);
 
         scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::sendDailyScheduled, 0, 60, TimeUnit.SECONDS);
-
-        schedulerWeatherCheck = Executors.newScheduledThreadPool(1);
-        schedulerWeatherCheck.scheduleAtFixedRate(this::checkWeatherCataclysms, 0, 30, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::backGroundTask, 0, 60, TimeUnit.SECONDS);
 
         this.client = client;
         this.weatherCommand = weatherCommand;
         usersChats = new ConcurrentHashMap<>();
 
         this.userService = userService;
+    }
+
+    private void backGroundTask() {
+        checkWeatherCataclysms();
+        sendDailyScheduled();
     }
 
     private void checkWeatherCataclysms() {
@@ -126,7 +127,7 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
                 try {
                     days = Integer.parseInt(daysStr);
                 } catch (NumberFormatException e) {
-                    days = 1; // default 1 день
+                    days = 1; // default 1
                 }
                 weatherCommand.execute(client, user, chat, new String[]{city, String.valueOf(days)});
             }
