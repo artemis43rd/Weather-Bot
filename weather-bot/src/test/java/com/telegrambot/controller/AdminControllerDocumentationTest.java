@@ -6,9 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.payload.PayloadDocumentation;
-import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -19,14 +16,19 @@ import com.telegrambot.config.TestMockConfig;
 import com.telegrambot.config.WebConfig;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebAppConfiguration
 @ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 @ContextConfiguration(classes = {WebConfig.class, TestMockConfig.class})
-public class AdminControllerDocumentationTest {
+class AdminControllerDocumentationTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -36,28 +38,35 @@ public class AdminControllerDocumentationTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
+                .apply(documentationConfiguration(restDocumentation)
                         .operationPreprocessors()
                         .withRequestDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
     }
 
-    //@Test
-    public void getUsersExample() throws Exception {
-        mockMvc.perform(get("/admin/users").param("password", "admin"))
+    @Test
+    void getUsersExample() throws Exception {
+        mockMvc.perform(get("/admin/users?password=admin"))
                 .andExpect(status().isOk())
                 .andDo(document("get-users",
-                        RequestDocumentation.requestParameters(
-                                RequestDocumentation.parameterWithName("password").description("Пароль администратора")
+                        queryParameters(
+                                parameterWithName("password")
+                                        .description("Пароль администратора")
                         ),
-                        PayloadDocumentation.responseFields(
-                                PayloadDocumentation.fieldWithPath("[].telegramId").description("ID пользователя в Telegram"),
-                                PayloadDocumentation.fieldWithPath("[].cityName").description("Город пользователя"),
-                                PayloadDocumentation.fieldWithPath("[].latitude").description("Широта"),
-                                PayloadDocumentation.fieldWithPath("[].longitude").description("Долгота"),
-                                PayloadDocumentation.fieldWithPath("[].scheduleTime").description("Время уведомления"),
-                                PayloadDocumentation.fieldWithPath("[].notifyCataclysm").description("Уведомление о катаклизмах")
+                        responseFields(
+                                fieldWithPath("[].telegramId")
+                                        .description("ID пользователя в Telegram"),
+                                fieldWithPath("[].cityName")
+                                        .description("Город пользователя"),
+                                fieldWithPath("[].latitude")
+                                        .description("Широта"),
+                                fieldWithPath("[].longitude")
+                                        .description("Долгота"),
+                                fieldWithPath("[].scheduleTime")
+                                        .description("Время уведомления"),
+                                fieldWithPath("[].notifyCataclysm")
+                                        .description("Уведомление о катаклизмах")
                         )));
     }
 }

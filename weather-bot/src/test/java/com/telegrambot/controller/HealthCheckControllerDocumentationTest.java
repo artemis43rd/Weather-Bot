@@ -32,7 +32,7 @@ class HealthCheckControllerDocumentationTest {
         .build();
     }
 
-    //@Test
+    @Test
     void healthCheckExample() throws Exception {
         mockMvc.perform(get("/healthcheck"))
             .andExpect(status().isOk())
