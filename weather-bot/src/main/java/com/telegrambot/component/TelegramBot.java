@@ -43,14 +43,20 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
     private final TelegramClient client;
     private final Weather weatherCommand;
     private final ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService schedulerWeatherCheck;
 
     private final UserService userService;
 
     public TelegramBot(TelegramClient client, Weather weatherCommand,
             @Value("${bot.name}") String botName, UserService userService) {
         super(client, true, () -> botName);
+
         scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::backgroundTasks, 0, 60, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::sendDailyScheduled, 0, 60, TimeUnit.SECONDS);
+
+        schedulerWeatherCheck = Executors.newScheduledThreadPool(1);
+        schedulerWeatherCheck.scheduleAtFixedRate(this::checkWeatherCataclysms, 0, 30, TimeUnit.MINUTES);
+
         this.client = client;
         this.weatherCommand = weatherCommand;
         usersChats = new ConcurrentHashMap<>();
@@ -58,9 +64,16 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
         this.userService = userService;
     }
 
-    private void backgroundTasks() {
-        logger.info("Update background tasks.");
-        sendDailyScheduled();
+    private void checkWeatherCataclysms() {
+        List<com.telegrambot.model.User> users = userService.getAllUsers();
+        for (com.telegrambot.model.User user : users) {
+            Long chatId = user.getTelegramId();
+            try {
+                weatherService.checkDailyWeatherAndNotify(client, chatId);
+            } catch (Exception e) {
+                logger.error("Error checking weather for user " + chatId, e);
+            }
+        }
     }
 
     public void sendDailyScheduled() {

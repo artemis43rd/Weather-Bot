@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.*;
 
@@ -202,6 +203,51 @@ public class WeatherService {
         try {
             client.execute(new SendMessage(String.valueOf(chatId), text));
         } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void checkDailyWeatherAndNotify(TelegramClient client, Long chatId) {
+        var dbUser = userService.getUser(chatId);
+        if (dbUser == null) return;
+
+        String cityName = dbUser.getCityName();
+        String url = buildWeatherApiUrl(cityName, dbUser);
+        if (url == null) return;
+
+        try {
+            String response = new RestTemplate().getForObject(url, String.class);
+            JsonNode root = new ObjectMapper().readTree(response);
+            JsonNode forecastList = root.get("list");
+            LocalDate today = LocalDate.now();
+
+            boolean cataclysmFound = false;
+            StringBuilder cataclysmDetails = new StringBuilder();
+
+            for (JsonNode item : forecastList) {
+                String dtTxt = item.get("dt_txt").asText();
+                LocalDate forecastDate = LocalDate.parse(dtTxt.substring(0, 10));
+                if (!forecastDate.equals(today)) continue;
+
+                LocalTime forecastTime = LocalTime.parse(dtTxt.substring(11, 16));
+                LocalTime now = LocalTime.now();
+                if (forecastTime.isBefore(now)) continue;
+
+                JsonNode weatherNode = item.get("weather").get(0);
+                String main = weatherNode.get("main").asText().toLowerCase();
+                String description = weatherNode.get("description").asText();
+
+                if (main.contains("rain") || main.contains("thunderstorm") || main.contains("drizzle") || main.contains("snow") || main.contains("storm")) {
+                    cataclysmFound = true;
+                    cataclysmDetails.append(String.format("%s — %s\n", dtTxt.substring(11, 16), description));
+                }
+            }
+
+            if (cataclysmFound) {
+                String message = "⚠️ Attention! Cataclysms are expected today:\n" + cataclysmDetails;
+                sendMessage(client, chatId, message);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
