@@ -1,5 +1,7 @@
 # 🌤️Weather-Bot
 
+[![Telegram Bot](https://img.shields.io/badge/Telegram-Try%20it-blue)](https://t.me/weather_java25_bot)
+
 ## 📋Dependencies
  - **TelegramBots Java**  
  - **Spring Framework** (Context, JDBC, Scheduling)  
