@@ -41,6 +41,9 @@ public class TelegramConfig {
     SetSchedule schedule;
 
     @Autowired
+    SetNotifyCata alert;
+
+    @Autowired
     HelpCommand help;
 
     @Bean
@@ -51,6 +54,7 @@ public class TelegramConfig {
         bot.register(settings);
         bot.register(weather);
         bot.register(schedule);
+        bot.register(alert);
         return botsApplication.registerBot(env.getProperty("token"), bot);
     }
 
