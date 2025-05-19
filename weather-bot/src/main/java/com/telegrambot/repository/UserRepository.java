@@ -1,5 +1,7 @@
 package com.telegrambot.repository;
 
+import java.sql.Time;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,5 +42,11 @@ public class UserRepository {
                 user.getScheduleTime(),
                 user.isNotifyCataclysm()
         );
+    }
+
+    @Transactional
+    public void updateScheduleTime(long telegramId, Time scheduleTime) {
+        String sql = "UPDATE users SET schedule_time = ? WHERE telegram_id = ?";
+        jdbcTemplate.update(sql, scheduleTime, telegramId);
     }
 }
