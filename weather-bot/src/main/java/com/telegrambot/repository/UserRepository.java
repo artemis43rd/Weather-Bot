@@ -1,6 +1,7 @@
 package com.telegrambot.repository;
 
 import java.sql.Time;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -48,5 +49,11 @@ public class UserRepository {
     public void updateScheduleTime(long telegramId, Time scheduleTime) {
         String sql = "UPDATE users SET schedule_time = ? WHERE telegram_id = ?";
         jdbcTemplate.update(sql, scheduleTime, telegramId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getAllUsers() {
+        String sql = "SELECT * FROM users";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class));
     }
 }

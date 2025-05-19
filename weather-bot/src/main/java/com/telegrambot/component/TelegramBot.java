@@ -2,6 +2,7 @@ package com.telegrambot.component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -9,14 +10,23 @@ import org.telegram.telegrambots.extensions.bots.commandbot.CommandLongPollingTe
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.sql.Time;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.telegrambot.service.GeocodingService;
+import com.telegrambot.service.UserService;
+import com.telegrambot.service.WeatherService;
 
 @Component
 @PropertySource("classpath:bot.properties")
@@ -25,16 +35,55 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
     @Value("${api-key}")
     private String apiKey;
 
+    @Autowired
+    private WeatherService weatherService;
+
     private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
     private final ConcurrentHashMap<Integer, Long> usersChats;
     private final TelegramClient client;
     private final Weather weatherCommand;
+    private final ScheduledExecutorService scheduler;
 
-    public TelegramBot(TelegramClient client, Weather weatherCommand, @Value("${bot.name}") String botName) {
+    private final UserService userService;
+
+    public TelegramBot(TelegramClient client, Weather weatherCommand,
+            @Value("${bot.name}") String botName, UserService userService) {
         super(client, true, () -> botName);
+        scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(this::backgroundTasks, 0, 60, TimeUnit.SECONDS);
         this.client = client;
         this.weatherCommand = weatherCommand;
         usersChats = new ConcurrentHashMap<>();
+
+        this.userService = userService;
+    }
+
+    private void backgroundTasks() {
+        logger.info("Update background tasks.");
+        sendDailyScheduled();
+    }
+
+    public void sendDailyScheduled() {
+        List< com.telegrambot.model.User> users = userService.getAllUsers();
+        LocalTime now = LocalTime.now();
+
+        for (com.telegrambot.model.User user : users) {
+            Time scheduleTime = user.getScheduleTime();
+            if (scheduleTime == null) continue;
+
+            LocalTime userTime = scheduleTime.toLocalTime();
+            if (now.getHour() == userTime.getHour() && now.getMinute() == userTime.getMinute()) {
+                Long chatId = user.getTelegramId();
+                sendResponse(chatId, "Your scheduled forecast for today.");
+                weatherService.handleWeatherCommand(client, chatId, chatId, new String[]{"1"});
+            }
+        }
+    }
+
+    @Override
+    public boolean filter(Message message) {
+        usersChats.put(message.getFrom().getId().intValue(), message.getChatId());
+        return super.filter(message);
     }
 
     @Override
@@ -121,7 +170,7 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
     private void sendResponse(Long chatId, String text) {
         SendMessage message = new SendMessage(chatId.toString(), text);
         try {
-            telegramClient.execute(message);
+            client.execute(message);
         } catch (TelegramApiException e) {
             logger.error("Error sending message: " + e.getMessage(), e);
         }

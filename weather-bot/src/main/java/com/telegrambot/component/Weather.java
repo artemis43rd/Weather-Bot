@@ -22,6 +22,8 @@ public class Weather extends BotCommand {
 
     @Override
     public void execute(TelegramClient client, User user, Chat chat, String[] args) {
-        weatherService.handleWeatherCommand(client, user, chat, args);
+        Long userId = user.getId();
+        Long chatId = chat.getId();
+        weatherService.handleWeatherCommand(client, userId, chatId, args);
     }
 }

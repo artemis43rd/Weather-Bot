@@ -1,6 +1,7 @@
 package com.telegrambot.service;
 
 import java.sql.Time;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,9 @@ public class UserService {
             user.setScheduleTime(scheduleTime);
             userRepository.updateScheduleTime(telegramId, scheduleTime);
         }
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.getAllUsers();
     }
 }
