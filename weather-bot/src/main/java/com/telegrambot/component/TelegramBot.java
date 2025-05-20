@@ -39,7 +39,6 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
     private WeatherService weatherService;
 
     private static final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
-    private final ConcurrentHashMap<Integer, Long> usersChats;
     private final TelegramClient client;
     private final Weather weatherCommand;
     private final ScheduledExecutorService scheduler;
@@ -55,7 +54,6 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
 
         this.client = client;
         this.weatherCommand = weatherCommand;
-        usersChats = new ConcurrentHashMap<>();
 
         this.userService = userService;
     }
@@ -92,12 +90,6 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
                 weatherService.handleWeatherCommand(client, chatId, chatId, new String[]{"1"});
             }
         }
-    }
-
-    @Override
-    public boolean filter(Message message) {
-        usersChats.put(message.getFrom().getId().intValue(), message.getChatId());
-        return super.filter(message);
     }
 
     @Override
