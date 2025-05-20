@@ -44,8 +44,6 @@ cd Weather-bot/weather-bot
 mvn clean package
 java -jar target/weather-bot-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
-### Docker
-...
 
 ## 🎯 Commands and using example
 
