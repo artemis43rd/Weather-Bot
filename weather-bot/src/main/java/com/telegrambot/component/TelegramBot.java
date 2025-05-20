@@ -126,7 +126,7 @@ public class TelegramBot extends CommandLongPollingTelegramBot {
                 try {
                     days = Integer.parseInt(daysStr);
                 } catch (NumberFormatException e) {
-                    days = 1; // default 1 день
+                    days = 1; // default 1
                 }
                 weatherCommand.execute(client, user, chat, new String[]{city, String.valueOf(days)});
             }

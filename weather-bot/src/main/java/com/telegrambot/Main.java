@@ -28,7 +28,6 @@ public class Main {
         tomcat.setPort(8080);
         tomcat.getConnector();                           // создаём коннектор
 
-        // docBase не может быть null → берём текущую папку
         String docBase = new File(".").getAbsolutePath();
         StandardContext ctx = (StandardContext) tomcat.addContext("", docBase);
 
@@ -38,11 +37,10 @@ public class Main {
         restContext.setServletContext(ctx.getServletContext());
         restContext.register(WebConfig.class);
 
-        // DispatcherServlet: регистрируем НИЗКО-УРОВНЕВО перед refresh()/start()
         String servletName = "dispatcher";
         DispatcherServlet dispatcher = new DispatcherServlet(restContext);
         Tomcat.addServlet(ctx, servletName, dispatcher);
-        ctx.addServletMappingDecoded("/", servletName);  // «/*» → «/»
+        ctx.addServletMappingDecoded("/", servletName);
 
         restContext.refresh();                           // запускаем Spring MVC
         tomcat.start();                                  // стартуем Tomcat

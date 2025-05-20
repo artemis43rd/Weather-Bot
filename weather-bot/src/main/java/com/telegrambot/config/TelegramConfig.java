@@ -12,14 +12,15 @@ import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.telegrambot.component.*;
-
 @Configuration
-@PropertySource("classpath:bot.properties")
+@PropertySource({"classpath:bot.properties", "classpath:kafka.properties"})
 @ComponentScan(basePackages = {
         "com.telegrambot.component",   // команды бота
-        "com.telegrambot.service",
+        "com.telegrambot.service",     // сервисы
         "com.telegrambot.repository",
-        "com.telegrambot.model"        // сущности JPA/JDBC
+        "com.telegrambot.model",       // сущности
+        "com.telegrambot.kafka.consumer", // Пакет с консьюмерами
+        "com.telegrambot.kafka.dto"       // Пакет с DTO для Kafka
 })
 public class TelegramConfig {
 
