@@ -1,4 +1,7 @@
 version: '3.8'
+
+networks:
+  my_network: {}
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -29,3 +32,28 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+  bot:
+    build: .
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    networks:
+      - my_network
+    
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: weather_bot
+    volumes:
+      - postgres-data:/etc/postgresql/16/main/
+    command: ["postgres", "-c", "log_statement=all"]
+    networks:
+      - my_network
+
+volumes:
+  postgres-data:

@@ -6,12 +6,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
 
 import jakarta.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 @PropertySource("classpath:database.properties")
@@ -65,7 +66,9 @@ public class DatabaseConfig {
     // Выполнение скрипта SQL для создания таблицы
     @PostConstruct
     public void initDatabase() throws IOException {
-        String createTableSql = new String(Files.readAllBytes(Paths.get("src/main/resources/create.sql")));
+        ClassPathResource resource = new ClassPathResource("create.sql");
+        byte[] fileData = FileCopyUtils.copyToByteArray(resource.getInputStream());
+        String createTableSql = new String(fileData, StandardCharsets.UTF_8);
         jdbcTemplate().execute(createTableSql);
     }
 }

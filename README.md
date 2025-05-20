@@ -33,7 +33,7 @@ Link to the bot:
 
 ## 🚀Deploy
 
-### Локальный запуск
+### Local Deploy
 
 ```bash
 git clone github.com/artemis43rd/Weather-Bot/
@@ -44,8 +44,19 @@ cd Weather-bot/weather-bot
 mvn clean package
 java -jar target/weather-bot-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
+
 ### Docker
-...
+Link to bot Docker image:
+[![Docker](https://hub.docker.com/r/artemis43rd/weather-bot)](https://hub.docker.com/r/artemis43rd/weather-bot)
+
+To use it, specify services.app.image: artemis43rd/weather-bot in docker-compose.yml instead of services.bot.build.
+```bash
+mvn package
+docker compose build
+ # requires 'db', 'zookeeper' and 'kafka' to run.
+docker compose up
+```
+
 
 ## 🎯 Commands and using example
 
