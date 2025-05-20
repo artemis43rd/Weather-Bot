@@ -12,42 +12,34 @@ import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.telegrambot.component.*;
-
-
 @Configuration
-@PropertySource("classpath:bot.properties")
-@ComponentScan(basePackages = "com.telegrambot")
+@PropertySource({"classpath:bot.properties", "classpath:kafka.properties"})
+@ComponentScan(basePackages = {
+        "com.telegrambot.component",   // команды бота
+        "com.telegrambot.service",     // сервисы
+        "com.telegrambot.repository",
+        "com.telegrambot.model",       // сущности
+        "com.telegrambot.kafka.consumer", // Пакет с консьюмерами
+        "com.telegrambot.kafka.dto"       // Пакет с DTO для Kafka
+})
 public class TelegramConfig {
 
     @Autowired
-    Environment env;
+    private Environment env;
 
-    @Autowired
-    TelegramBot bot;
+    /* команды Telegram-бота */
+    @Autowired private TelegramBot   bot;
+    @Autowired private StartCommand  start;
+    @Autowired private HelpCommand   help;
+    @Autowired private SetLocation   setLocation;
+    @Autowired private PrintSettings settings;
+    @Autowired private Weather       weather;
+    @Autowired private SetSchedule   schedule;
+    @Autowired private SetNotifyCata alert;
 
-    @Autowired
-    StartCommand start;
-
-    @Autowired
-    SetLocation setLocation;
-
-    @Autowired
-    PrintSettings settings;
-
-    @Autowired
-    Weather weather;
-
-    @Autowired
-    SetSchedule schedule;
-
-    @Autowired
-    SetNotifyCata alert;
-
-    @Autowired
-    HelpCommand help;
-
+    /* ----- инициализация бота ----- */
     @Bean
-    public BotSession sessionStart(TelegramBotsLongPollingApplication botsApplication, TelegramBot bot) throws TelegramApiException {
+    public BotSession sessionStart(TelegramBotsLongPollingApplication app) throws TelegramApiException {
         bot.register(start);
         bot.register(help);
         bot.register(setLocation);
@@ -55,7 +47,7 @@ public class TelegramConfig {
         bot.register(weather);
         bot.register(schedule);
         bot.register(alert);
-        return botsApplication.registerBot(env.getProperty("token"), bot);
+        return app.registerBot(env.getProperty("token"), bot);
     }
 
     @Bean

@@ -13,7 +13,7 @@ public class User {
 
     // Конструкторы
     public User(long telegram_id, String cityName, BigDecimal latitude, BigDecimal longitude,
-                Time scheduleTime, boolean notifyPrecipitation, boolean notifyCataclysm) {
+                Time scheduleTime, boolean notifyCataclysm) {
         this.telegram_id = telegram_id;
         this.cityName = cityName;
         this.latitude = latitude;
