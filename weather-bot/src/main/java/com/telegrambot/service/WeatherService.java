@@ -210,6 +210,7 @@ public class WeatherService {
     public void checkDailyWeatherAndNotify(TelegramClient client, Long chatId) {
         var dbUser = userService.getUser(chatId);
         if (dbUser == null) return;
+        if (!dbUser.isNotifyCataclysm()) return;
 
         String cityName = dbUser.getCityName();
         String url = buildWeatherApiUrl(cityName, dbUser);
