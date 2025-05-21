@@ -1,7 +1,8 @@
-version: '3.8'
+# docker-compose.yml
 
 networks:
   my_network: {}
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -12,46 +13,80 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - my_network
+    # healthcheck: # ВРЕМЕННО УДАЛЯЕМ HEALTHCHECK У ZOOKEEPER
+    #   test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
     hostname: kafka
     container_name: kafka
     depends_on:
-      - zookeeper
+      # zookeeper: # Убираем зависимость от health, т.к. у ZK нет healthcheck
+        # condition: service_healthy 
+      - zookeeper # Оставляем простую зависимость по имени сервиса
     ports:
-      - "9092:9092" # Для доступа с хост-машины
-      - "29092:29092" # Для доступа из других контейнеров
+      - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 3000
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-  bot:
-    build: .
-    depends_on:
-      - kafka
-    ports:
-      - "8081:8081"
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
     networks:
       - my_network
-    
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list > /dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s # Увеличил start_period для Kafka еще больше, на всякий случай
+
   db:
-    image: postgres
+    image: postgres:16-alpine
+    container_name: weather-bot-db
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: weather_bot
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres-data:/etc/postgresql/16/main/
+      - postgres-data:/var/lib/postgresql/data
     command: ["postgres", "-c", "log_statement=all"]
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  bot:
+    build: .
+    container_name: weather-bot-app
+    depends_on:
+      kafka:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    ports:
+      - "${BOT_HOST_HTTP_PORT}:8080"
+    env_file:
+      - ./.env
     networks:
       - my_network
 

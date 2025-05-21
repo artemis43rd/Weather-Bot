@@ -9,12 +9,47 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 
+            Убедись, что этот путь корректен для твоей системы.
+            Это должен быть путь к корневой директории JDK 21,
+            например, /Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home
+            или /usr/lib/jvm/java-21-openjdk-amd64 и т.д.
+            Для Homebrew на M1/M2 это обычно что-то вроде:
+            /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+        -->
+        <jdk.21.home>/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home</jdk.21.home>
+
+        <!-- Версии зависимостей -->
+        <spring.version>6.2.6</spring.version>
+        <telegrambots.version>7.11.0</telegrambots.version>
+        <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
+        <slf4j.version>2.0.9</slf4j.version> <!-- Обновлено до последней 2.0.x, можно рассмотреть 2.0.13 -->
+        <logback.version>1.5.6</logback.version> <!-- Обновлено, можно рассмотреть 1.5.x -->
+        <tomcat.embed.version>10.1.25</tomcat.embed.version> <!-- Обновлено -->
+        <jakarta.servlet-api.version>5.0.0</jakarta.servlet-api.version> <!-- Оставляем 5.0.0 для Tomcat 10.1.x -->
+        <commons-dbcp2.version>2.12.0</commons-dbcp2.version> <!-- Обновлено -->
+        <postgresql.version>42.7.3</postgresql.version> <!-- Обновлено -->
+        <junit.jupiter.version>5.10.2</junit.jupiter.version> <!-- Обновлено -->
+        <mockito.core.version>5.12.0</mockito.core.version> <!-- Важное обновление для поддержки Java 21+ -->
+        <spring-restdocs-bom.version>3.0.2</spring-restdocs-bom.version> <!-- Обновлено -->
+        <kafka-clients.version>3.7.1</kafka-clients.version> <!-- Обновлено -->
+        <jackson.version>2.17.1</jackson.version> <!-- Обновлено -->
+
+        <!-- Версии плагинов -->
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version> <!-- Обновлено -->
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version> <!-- Стабильная версия -->
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.restdocs</groupId>
                 <artifactId>spring-restdocs-bom</artifactId>
-                <version>3.0.1</version>
+                <version>${spring-restdocs-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -26,71 +61,71 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-extensions</artifactId>
-            <version>7.11.0</version>
+            <version>${telegrambots.version}</version>
         </dependency>
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
-            <version>7.11.0</version>
+            <version>${telegrambots.version}</version>
         </dependency>
 
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>2.1.1</version>
+            <version>${jakarta.annotation-api.version}</version>
         </dependency>
 
         <!-- Логирование -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
+            <version>${logback.version}</version>
         </dependency>
 
         <!-- Spring 6 / Jakarta EE 10 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>6.2.6</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>6.2.6</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>6.2.6</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>6.2.6</version>
+            <version>${spring.version}</version>
         </dependency>
 
-        <!-- Встроенный Tomcat 10 → Jakarta Servlet 5 -->
+        <!-- Встроенный Tomcat 10 -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.12</version>
+            <version>${tomcat.embed.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-websocket</artifactId>
-            <version>10.1.12</version>
+            <version>${tomcat.embed.version}</version>
         </dependency>
 
         <!-- API только для компиляции -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
+            <version>${jakarta.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -98,57 +133,68 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.13.0</version>
+            <version>${commons-dbcp2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.6.0</version>
+            <version>${postgresql.version}</version>
         </dependency>
 
         <!-- Тесты -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.3</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>6.2.6</version>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.5.0</version>
+            <version>${mockito.core.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- 
+            Если вы используете mockito-inline явно (хотя обычно он идет с core), 
+            убедитесь, что его версия совместима. С Mockito 5.x он обычно уже включен.
+            Для mockito-core 5.5.0+ mockito-inline является частью mockito-core.
+            Но для более старых версий или если вы хотите быть уверены, можно добавить:
+        -->
+        <!-- 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+
 
         <!-- Spring REST Docs 3.x (Jakarta) -->
         <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-mockmvc</artifactId>
+            <!-- Версия управляется BOM -->
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>3.7.0</version> 
+            <version>${kafka-clients.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.15.3</version>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
-
-    <properties>
-        <maven.compiler.release>21</maven.compiler.release>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <build>
         <plugins>
@@ -156,9 +202,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <release>21</release>
+                    <release>${maven.compiler.release}</release>
+                    <!-- Более явное указание, если <release> не срабатывает -->
+                    <!-- <fork>true</fork> -->
+                    <!-- <executable>${jdk.21.home}/bin/javac</executable> -->
                 </configuration>
             </plugin>
 
@@ -166,7 +215,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -189,14 +238,90 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <!-- 
+                        Явное указание JVM для запуска тестов.
+                        Это самый надежный способ убедиться, что используется правильная версия Java.
+                    -->
+                    <jvm>${jdk.21.home}/bin/java</jvm>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
+                    <!-- 
+                       useSystemClassLoader=false часто рекомендуется для избежания проблем с classpath,
+                       но иногда может вызывать другие проблемы. Если тесты не находят классы,
+                       попробуйте закомментировать или установить в true.
+                    -->
                     <useSystemClassLoader>false</useSystemClassLoader>
+                    <!--
+                       Если после всех исправлений проблема с ByteBuddy и Java 23/21 всё ещё будет,
+                       можно попробовать раскомментировать этот флаг как крайнюю меру.
+                       Но с Mockito 5.12.0 и Java 21 это не должно быть нужно.
+                    -->
+                    <!--
+                    <argLine>
+                        -Dnet.bytebuddy.experimental=true
+                    </argLine>
+                    -->
                 </configuration>
             </plugin>
+            
+            <!-- Плагин для Spring REST Docs Asciidoctor (если вы генерируете документацию) -->
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>3.0.0</version> <!-- Или более свежая версия -->
+                <executions>
+                    <execution>
+                        <id>generate-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>html5</backend>
+                            <doctype>book</doctype>
+                            <attributes>
+                                <snippets>${project.build.directory}/generated-snippets</snippets>
+                            </attributes>
+                            <sourceDirectory>${project.basedir}/src/test/resources/asciidoc</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-docs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework.restdocs</groupId>
+                        <artifactId>spring-restdocs-asciidoctor</artifactId>
+                        <version>${spring-restdocs-bom.version}</version> <!-- Используйте ту же версию, что и BOM -->
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+             <!-- Копирование сгенерированной документации в статические ресурсы (если нужно для fat-jar) -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-restdocs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/static/docs</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-docs</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>

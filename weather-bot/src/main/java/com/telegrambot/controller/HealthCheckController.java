@@ -1,10 +1,10 @@
+// Файл: ./weather-bot/src/main/java/com/telegrambot/controller/HealthCheckController.java
 package com.telegrambot.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
+import java.util.List; // Убедись, что импорт есть, если его не было
 
-record HealthStatusRecord(String status, List<String> authors, String message) {}
 @RestController
 public class HealthCheckController {
 
