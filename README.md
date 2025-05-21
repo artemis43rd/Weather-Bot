@@ -57,6 +57,16 @@ docker compose build
 docker compose up
 ```
 
+## Администрирование
+### Проверка состояния
+```bash
+curl http://localhost:8081/healthcheck
+```
+
+### Список пользователей (админ)
+```bash
+curl 'http://localhost:8081/admin/users' -i -u 'admin:admin'
+```
 
 ## 🎯 Commands and using example
 
