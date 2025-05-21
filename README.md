@@ -1,7 +1,7 @@
 # 🌤️Weather-Bot
 
 Link to the bot:
-[![Telegram Bot](https://img.shields.io/badge/Telegram-Try%20it-blue)](https://t.me/weather_java25_bot)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-Try%20it-blue)](https://t.me/weather_java2025_bot)
 
 ## 📋Dependencies
  - **Spring Framework** (REST, JDBC, REST Docs)
