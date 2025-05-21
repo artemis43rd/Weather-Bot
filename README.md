@@ -39,7 +39,8 @@ Link to the bot:
 git clone github.com/artemis43rd/Weather-Bot/
 cd Weather-bot/weather-bot
 
-# input src/main/resources/{bot,database}.properties:
+# export needed variables (TELEGRAM_BOT_TOKEN, OPENWEATHER_API_KEY
+# and others form .properties files)
 
 mvn clean package
 java -jar target/weather-bot-1.0-SNAPSHOT-jar-with-dependencies.jar
@@ -49,11 +50,17 @@ java -jar target/weather-bot-1.0-SNAPSHOT-jar-with-dependencies.jar
 Link to bot Docker image:
 [![Docker](https://hub.docker.com/r/artemis43rd/weather-bot)](https://hub.docker.com/r/artemis43rd/weather-bot)
 
-To use it, specify services.app.image: artemis43rd/weather-bot in docker-compose.yml instead of services.bot.build.
+1. Create a file `.env` at the root of the project:
+
 ```bash
-mvn package
-docker compose build
- # requires 'db', 'zookeeper' and 'kafka' to run.
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+OPENWEATHER_API_KEY=your_openweather_api_key
+BOT_NAME=your_bot_name
+...
+```
+
+2. Run the command in the files `.env` and `docker-compose.yml` directory:
+```bash
 docker compose up
 ```
 
