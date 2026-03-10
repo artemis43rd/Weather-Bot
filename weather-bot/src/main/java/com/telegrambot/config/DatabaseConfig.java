@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import org.springframework.util.StreamUtils;
+
 import jakarta.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 @PropertySource("classpath:database.properties")
@@ -65,7 +67,9 @@ public class DatabaseConfig {
     // Выполнение скрипта SQL для создания таблицы
     @PostConstruct
     public void initDatabase() throws IOException {
-        String createTableSql = new String(Files.readAllBytes(Paths.get("src/main/resources/create.sql")));
-        jdbcTemplate().execute(createTableSql);
+        try (InputStream inputStream = getClass().getResourceAsStream("/create.sql")) {
+            String createTableSql = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            jdbcTemplate().execute(createTableSql);
+        }
     }
 }
